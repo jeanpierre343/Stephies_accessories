@@ -1,18 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 
 const app = express();
+dotenv.config();
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || '127.0.0.1',
-  port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'stephie-s_accessories',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -55,6 +57,46 @@ app.get('/api/products', async (req, res) => {
     console.error('Database error:', error);
     res.status(500).json({
       error: 'Unable to load products from database.',
+    });
+  }
+});
+
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    const [rows] = await pool.query(
+      'SELECT admin_user FROM admin WHERE id = 1'
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({
+        message: 'Invalid password',
+      });
+    }
+
+    const admin = rows[0];
+
+    const passwordCorrect = await bcrypt.compare(
+      password,
+      admin.admin_user
+    );
+
+    if (!passwordCorrect) {
+      return res.status(401).json({
+        message: 'Invalid password',
+      });
+    }
+
+    res.json({
+      message: 'Login successful',
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: 'Server error',
     });
   }
 });
