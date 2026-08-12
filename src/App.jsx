@@ -375,16 +375,7 @@ function App() {
                       <h3>{product.name}</h3>
                       {product.description ? <p>{product.description}</p> : null}
                       <div className="product-meta">${product.price}</div>
-                      <button
-                        type="button"
-                        className="product-detail-trigger"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openProductDetails(product);
-                        }}
-                      >
-                        View details
-                      </button>
+                      
                     </article>
                   ))}
                 </div>
