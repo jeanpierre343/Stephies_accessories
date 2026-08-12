@@ -897,6 +897,7 @@ button {
   color: var(--charcoal-800);
   opacity: 50%;
   font-size: 16px;
+  cursor: default;
 }
 
 .form-container {
@@ -981,6 +982,59 @@ button {
   margin-top: 18px;
   font-weight: 700;
   color: var(--rose-700);
+}
+
+.dashboard-header-container{
+  display:flex;
+  justify-content: space-between;
+  color:white;
+  padding:.75rem 1rem;
+  background-color: var(--charcoal-900);
+}
+
+.dashboard-title-container{
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  gap:5px;
+}
+
+.header-title{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.header-title p{
+  margin:0;
+}
+
+.header-logo-container{
+  border-radius: 999px;
+  color: var(--rose-700);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.header-logo-container .header-logo{
+  width: 28px;
+  height: 28px;
+}
+
+.dashboard-sign-out-button{
+  display:flex;
+  gap:2px;
+  color:#fff9;
+  font-size:.75rem;
+  align-items: center;
+  cursor:pointer;
+}
+
+.dashboard-sign-out-button:hover{
+  color:white;
+  transition:all .5s;
 }
 
 @media (max-width: 860px) {
