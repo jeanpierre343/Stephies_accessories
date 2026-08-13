@@ -64,6 +64,7 @@ app.get('/api/products', async (req, res) => {
     console.error('Database error:', error);
     res.status(500).json({
       error: 'Unable to load products from database.',
+      details: error.message,
     });
   }
 });
