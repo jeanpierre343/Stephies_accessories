@@ -35,15 +35,14 @@ function App() {
   const [typedText, setTypedText] = useState('');
   const [productsData, setProductsData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(null);
   const [panelKey, setPanelKey] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [braceletSize, setBraceletSize] = useState('');
+  const [showSizeTutorial, setShowSizeTutorial] = useState(false);
   const [view, setView] = useState('shop');
   const [cartItems, setCartItems] = useState([]);
   const [checkoutForm, setCheckoutForm] = useState({ phone: '', fullName: '' });
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
-  const [checkoutItems, setCheckoutItems] = useState([]);
   const [route, setRoute] = useState(() => window.location.pathname);
   const currentYear = new Date().getFullYear();
   const animatedText = 'check our beautiful pieces that shine with charming color and thoughtful detail.';
@@ -91,7 +90,6 @@ function App() {
         setProductsData(data);
       } catch (error) {
         console.error('Failed to load products:', error);
-        setFetchError(error.message);
       } finally {
         setLoading(false);
       }
@@ -108,9 +106,65 @@ function App() {
   };
 
   const openProductDetails = (product) => {
-    setSelectedProduct(product);
-    setQuantity(1);
-  };
+  setSelectedProduct(product);
+  setQuantity(1);
+  setBraceletSize('');
+  setShowSizeTutorial(false);
+};
+
+const sendOrderViaWhatsApp = (itemsToOrder) => {
+  if (!itemsToOrder.length) {
+    return;
+  }
+
+  if (!checkoutForm.phone.trim() || !checkoutForm.fullName.trim()) {
+    return;
+  }
+
+  if (
+    itemsToOrder.some(
+      (item) =>
+        item.category?.toLowerCase() === 'bracelet' &&
+        !item.size
+    )
+  ) {
+    return;
+  }
+
+  const productsText = itemsToOrder
+    .map((item) => {
+      const sizeText = item.size
+        ? ` (size ${item.size}cm)`
+        : '';
+
+      return `    • ${item.name} (product #${item.id}) x${item.quantity}${sizeText}`;
+    })
+    .join('\n\n');
+
+  const orderTotal = itemsToOrder.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  const message = `Hi Steph! I'd like to order.
+
+products details:
+
+${productsText}
+
+total: $${orderTotal.toFixed(2)}
+
+delivery info:
+    • phone: ${checkoutForm.phone.trim()}
+    • full name: ${checkoutForm.fullName.trim()}
+
+Looking forward to my new accessories!`;
+
+  const whatsappUrl =
+    `https://wa.me/96181519842?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+};
 
   const closeProductDetails = () => {
     setSelectedProduct(null);
@@ -121,78 +175,70 @@ function App() {
     setQuantity(Number.isNaN(nextValue) || nextValue < 1 ? 1 : nextValue);
   };
 
-  const addToCart = () => {
-    if (!selectedProduct) {
-      return;
+ const addToCart = () => {
+  if (!selectedProduct) {
+    return;
+  }
+
+  const isBracelet = selectedProduct.category?.toLowerCase() === 'bracelet';
+
+  if (isBracelet && !braceletSize.trim()) {
+    return;
+  }
+
+  const itemToAdd = {
+  id: selectedProduct.id,
+  name: selectedProduct.name,
+  price: Number(selectedProduct.price || 0),
+  quantity,
+  category: selectedProduct.category,
+  size: selectedProduct.category === 'bracelet' ? braceletSize : null,
+};
+
+  setCartItems((currentItems) => {
+    const existingItem = currentItems.find(
+  (item) =>
+    item.id === itemToAdd.id &&
+    item.size === itemToAdd.size
+);
+
+    if (existingItem) {
+      return currentItems.map((item) =>
+        item.id === itemToAdd.id &&
+        item.size === itemToAdd.size
+          ? {
+              ...item,
+              quantity: item.quantity + itemToAdd.quantity,
+            }
+          : item
+      );
     }
 
-    const itemToAdd = {
-      id: selectedProduct.id,
-      name: selectedProduct.name,
-      price: Number(selectedProduct.price || 0),
-      quantity,
-    };
+    return [...currentItems, itemToAdd];
+  });
 
-    setCartItems((currentItems) => {
-      const existingItem = currentItems.find((item) => item.id === itemToAdd.id);
-      if (existingItem) {
-        return currentItems.map((item) =>
-          item.id === itemToAdd.id
-            ? { ...item, quantity: item.quantity + itemToAdd.quantity }
-            : item
-        );
-      }
-      return [...currentItems, itemToAdd];
-    });
+  setView('cart');
+  setSelectedProduct(null);
+};
+  const updateCartItemQuantity = (itemId, itemSize, nextQuantity) => {
+  setCartItems((currentItems) =>
+    currentItems
+      .map((item) =>
+        item.id === itemId && item.size === itemSize
+          ? { ...item, quantity: nextQuantity }
+          : item
+      )
+      .filter((item) => item.quantity > 0)
+  );
+};
 
-    setView('cart');
-  };
-
-  const updateCartItemQuantity = (itemId, nextQuantity) => {
-    setCartItems((currentItems) =>
-      currentItems
-        .map((item) => (item.id === itemId ? { ...item, quantity: nextQuantity } : item))
-        .filter((item) => item.quantity > 0)
-    );
-  };
-
-  const removeCartItem = (itemId) => {
-    setCartItems((currentItems) => currentItems.filter((item) => item.id !== itemId));
-  };
-
-  const handleOrder = (itemsToOrder = null) => {
-    const orderItems = itemsToOrder || (cartItems.length > 0
-      ? cartItems
-      : selectedProduct
-        ? [{ id: selectedProduct.id, name: selectedProduct.name, price: Number(selectedProduct.price || 0), quantity }]
-        : []);
-
-    if (!orderItems.length) {
-      return;
-    }
-
-    setCheckoutItems(orderItems);
-    setShowCheckoutForm(true);
-  };
-
-  const submitOrder = (event) => {
-    event.preventDefault();
-
-    if (!checkoutForm.phone.trim() || !checkoutForm.fullName.trim()) {
-      return;
-    }
-
-    const productsText = checkoutItems
-      .map((item) => `    • ${item.name} (product # ${item.id}) x${item.quantity}`)
-      .join('\n');
-    const orderTotal = checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-    const message = `Hi Steph! I'd like to order.\n\nproducts details:\n${productsText}\n\ntotal: $${orderTotal.toFixed(2)}\n\ndelivery info:\n    • phone: ${checkoutForm.phone.trim()}\n    • full name: ${checkoutForm.fullName.trim()}\n\nLooking forward to my new accessories!`;
-    const whatsappUrl = `https://wa.me/96181519842?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    setShowCheckoutForm(false);
-    setCheckoutForm({ phone: '', fullName: '' });
-  };
+  const removeCartItem = (itemId, itemSize) => {
+  setCartItems((currentItems) =>
+    currentItems.filter(
+      (item) => !(item.id === itemId && item.size === itemSize)
+    )
+  );
+};
 
   const totalPrice = selectedProduct ? Number(selectedProduct.price || 0) * quantity : 0;
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -216,7 +262,7 @@ function App() {
               handmade accessories made with love and passion
             </p>
             <div className="hero-actions">
-              <span className="pill">Curated collections</span>
+              <span className="pill">Unique collections</span>
               <span className="pill">Everyday elegance</span>
             </div>
           </div>
@@ -248,8 +294,12 @@ function App() {
                     {cartItems.map((item) => (
                       <div key={item.id} className="cart-item-row">
                         <div>
-                          <h3>{item.name}</h3>
-                          <p>Product ID: {item.id}</p>
+                         <h3>{item.name}</h3>
+<p>Product ID: {item.id}</p>
+
+{item.size ? (
+  <p>Size: {item.size}cm</p>
+) : null}
                         </div>
                         <div className="cart-item-actions">
                           <label className="cart-quantity-control">
@@ -258,11 +308,17 @@ function App() {
                               type="number"
                               min="1"
                               value={item.quantity}
-                              onChange={(event) => updateCartItemQuantity(item.id, Number(event.target.value) || 1)}
+                              onChange={(event) =>
+  updateCartItemQuantity(
+    item.id,
+    item.size,
+    Number(event.target.value) || 1
+  )
+}
                             />
                           </label>
                           <div className="cart-item-price">${(item.price * item.quantity).toFixed(2)}</div>
-                          <button type="button" className="cart-remove-button" onClick={() => removeCartItem(item.id)}>
+                          <button type="button" className="cart-remove-button" onClick={() => removeCartItem(item.id, item.size)}>
                             Remove
                           </button>
                         </div>
@@ -276,41 +332,15 @@ function App() {
                     </div>
                     <div className="cart-summary-actions">
                       <strong>${cartTotal.toFixed(2)}</strong>
-                      <button type="button" className="order-button" onClick={() => handleOrder(cartItems)}>
-                        Order via WhatsApp
-                      </button>
+                      <button
+  type="button"
+  className="order-button"
+  onClick={() => sendOrderViaWhatsApp(cartItems)}
+>
+  Send via WhatsApp
+</button>
                     </div>
                   </div>
-                  {showCheckoutForm ? (
-                    <form className="checkout-form" onSubmit={submitOrder}>
-                      <h4>Delivery info</h4>
-                      <label>
-                        <span>Phone number</span>
-                        <input
-                          type="tel"
-                          value={checkoutForm.phone}
-                          onChange={(event) => setCheckoutForm((current) => ({ ...current, phone: event.target.value }))}
-                          required
-                        />
-                      </label>
-                      <label>
-                        <span>Full name</span>
-                        <input
-                          type="text"
-                          value={checkoutForm.fullName}
-                          onChange={(event) => setCheckoutForm((current) => ({ ...current, fullName: event.target.value }))}
-                          required
-                        />
-                      </label>
-                      <p className="delivery-note">Delivery fee: $3–$4</p>
-                      <div className="checkout-actions">
-                        <button type="submit" className="order-button">Send order</button>
-                        <button type="button" className="cart-remove-button" onClick={() => setShowCheckoutForm(false)}>
-                          Cancel
-                        </button>
-                      </div>
-                    </form>
-                  ) : null}
                 </>
               ) : (
                 <div className="cart-empty-state">
@@ -406,58 +436,154 @@ function App() {
                   <span>Product ID</span>
                   <strong>{selectedProduct.id}</strong>
                 </div>
-                <div className="product-quantity-section">
-                  <label htmlFor="product-quantity">Quantity</label>
-                  <input
-                    id="product-quantity"
-                    type="number"
-                    min="1"
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                  />
-                </div>
+                {selectedProduct.category?.toLowerCase() === 'bracelet' ? (
+  <div className="bracelet-size-section">
+    <div className="bracelet-size-header">
+      <label htmlFor="bracelet-size">Bracelet size (cm)</label>
+      <button
+        type="button"
+        className="size-help-button"
+        onClick={() => setShowSizeTutorial((current) => !current)}
+        aria-label="How to measure bracelet size"
+      >
+       Tutorial ?
+      </button>
+    </div>
+
+    <input
+      id="bracelet-size"
+      type="number"
+      min="1"
+      step="0.5"
+      placeholder="e.g. 13"
+      value={braceletSize}
+      onChange={(event) => setBraceletSize(event.target.value)}
+      required
+    />
+
+    {showSizeTutorial ? (
+      <div className="size-tutorial">
+        <p><strong>Items needed:</strong> ruler, sharpie and ribbon.</p>
+
+        <p>
+          <strong>Step 1:</strong> wrap the ribbon around your wrist. Note where it meets.
+        </p>
+
+        <p>
+          <strong>Step 2:</strong> mark the ribbon with the sharpie.
+        </p>
+
+        <p>
+          <strong>Step 3:</strong> measure using ruler.
+        </p>
+
+        <p>
+          <strong>NOTE:</strong> Add an extra 0.5cm/1cm to ensure a comfortable fit.
+        </p>
+
+        <p>
+          <a
+            href="https://vt.tiktok.com/ZS4K6nDA4/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Video tutorial
+          </a>
+        </p>
+      </div>
+    ) : null}
+  </div>
+) : null}
+
+<div className="product-quantity-section">
+  <label htmlFor="product-quantity">Quantity</label>
+  <input
+    id="product-quantity"
+    type="number"
+    min="1"
+    value={quantity}
+    onChange={handleQuantityChange}
+  />
+</div>
                 <div className="product-total-row">
                   <span>Total</span>
                   <strong>${totalPrice.toFixed(2)}</strong>
                 </div>
-                <div className="product-actions-row">
-                  <button type="button" className="add-to-cart-button" onClick={addToCart}>
-                    Add to cart
-                  </button>
-                  <button type="button" className="order-button" onClick={() => handleOrder()}>
-                    Order via WhatsApp
-                  </button>
-                </div>
-                {showCheckoutForm ? (
-                  <form className="checkout-form" onSubmit={submitOrder}>
-                    <h4>Delivery info</h4>
-                    <label>
-                      <span>Phone number</span>
-                      <input
-                        type="tel"
-                        value={checkoutForm.phone}
-                        onChange={(event) => setCheckoutForm((current) => ({ ...current, phone: event.target.value }))}
-                        required
-                      />
-                    </label>
-                    <label>
-                      <span>Full name</span>
-                      <input
-                        type="text"
-                        value={checkoutForm.fullName}
-                        onChange={(event) => setCheckoutForm((current) => ({ ...current, fullName: event.target.value }))}
-                        required
-                      />
-                    </label>
-                    <p className="delivery-note">Delivery fee: $3–$4</p>
-                    <div className="checkout-actions">
-                      <button type="submit" className="order-button">Send order</button>
-                      <button type="button" className="cart-remove-button" onClick={() => setShowCheckoutForm(false)}>
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                ) : null}
+                <form className="checkout-form">
+  <h4>Delivery info</h4>
+
+  <label>
+    <span>Phone number</span>
+    <input
+      type="tel"
+      value={checkoutForm.phone}
+      onChange={(event) =>
+        setCheckoutForm((current) => ({
+          ...current,
+          phone: event.target.value
+        }))
+      }
+      required
+    />
+  </label>
+
+  <label>
+    <span>Full name</span>
+    <input
+      type="text"
+      value={checkoutForm.fullName}
+      onChange={(event) =>
+        setCheckoutForm((current) => ({
+          ...current,
+          fullName: event.target.value
+        }))
+      }
+      required
+    />
+  </label>
+
+  <p className="delivery-note">
+    Delivery fee: $3–$4
+  </p>
+</form>
+          <div className="product-actions-row">
+  <button
+    type="button"
+    className="add-to-cart-button"
+    onClick={addToCart}
+  >
+    Add to cart
+  </button>
+
+  <button
+  type="button"
+  className="order-button"
+  onClick={() => {
+    const directOrderItem = {
+      id: selectedProduct.id,
+      name: selectedProduct.name,
+      price: Number(selectedProduct.price || 0),
+      quantity,
+      category: selectedProduct.category,
+      size:
+        selectedProduct.category?.toLowerCase() === 'bracelet'
+          ? braceletSize
+          : null,
+    };
+
+    if (
+      selectedProduct.category?.toLowerCase() === 'bracelet' &&
+      !braceletSize.trim()
+    ) {
+      return;
+    }
+
+    sendOrderViaWhatsApp([directOrderItem]);
+  }}
+>
+  Send via WhatsApp
+</button>
+</div>
               </div>
             </div>
           </div>
