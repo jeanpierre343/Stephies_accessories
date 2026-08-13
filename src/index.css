@@ -345,6 +345,39 @@ button {
   margin-bottom: 24px;
 }
 
+.cart-item-product {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cart-item-image-wrapper {
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.cart-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cart-item-details {
+  min-width: 0;
+}
+
+.cart-item-details h3 {
+  margin: 0 0 6px;
+}
+
+.cart-item-details p {
+  margin: 3px 0;
+}
+
 @media (max-width: 860px) {
   .category-row {
     grid-template-columns: 1fr;
