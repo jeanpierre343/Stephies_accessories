@@ -288,7 +288,7 @@ Looking forward to my new accessories!`;
             <div className="section-header">
               <p className="section-label">Your cart</p>
               <h2>Edit your order</h2>
-              <p>Adjust quantities or remove products before sending you WhatsApp order.</p>
+              <p>Adjust quantities or remove products before sending your WhatsApp order.</p>
             </div>
             <div className="cart-page-card">
               {cartItems.length > 0 ? (
