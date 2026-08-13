@@ -617,7 +617,7 @@ Looking forward to my new accessories!`;
           <hr className="footer-divider" />
           <div className="footer-bottom">
             <p className="footer-left">© {currentYear} STEPHIE'S ACCESSORIES. All rights reserved.</p>
-            <p className="footer-credit footer-right">Dev by <span>JeanPierre</span></p>
+            <p className="footer-credit footer-right">Dev by <span><a href="https://github.com/jeanpierre343">JeanPierre</a></span></p>
           </div>
         </div>
       </footer>
