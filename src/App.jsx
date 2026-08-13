@@ -514,13 +514,36 @@ Looking forward to my new accessories!`;
 
 <div className="product-quantity-section">
   <label htmlFor="product-quantity">Quantity</label>
-  <input
-    id="product-quantity"
-    type="number"
-    min="1"
-    value={quantity}
-    onChange={handleQuantityChange}
-  />
+
+  <div className="quantity-controls">
+    <button
+      type="button"
+      className="quantity-minus"
+      onClick={() =>
+        setQuantity((current) => Math.max(1, current - 1))
+      }
+    >
+      −
+    </button>
+
+    <input
+      id="product-quantity"
+      type="number"
+      min="1"
+      value={quantity}
+      onChange={handleQuantityChange}
+    />
+
+    <button
+      type="button"
+      className="quantity-plus"
+      onClick={() =>
+        setQuantity((current) => current + 1)
+      }
+    >
+      +
+    </button>
+  </div>
 </div>
                 <div className="product-total-row">
                   <span>Total</span>
