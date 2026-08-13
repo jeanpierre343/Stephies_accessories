@@ -9,6 +9,7 @@
 
 # Keep an example file if you have one
 !.env.example
+.wrangler/
 
 
 # ================================
