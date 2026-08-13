@@ -190,9 +190,12 @@ Looking forward to my new accessories!`;
   id: selectedProduct.id,
   name: selectedProduct.name,
   price: Number(selectedProduct.price || 0),
+  image_url: selectedProduct.image_url,
   quantity,
   category: selectedProduct.category,
-  size: selectedProduct.category === 'bracelet' ? braceletSize : null,
+  size: selectedProduct.category?.toLowerCase() === 'bracelet'
+    ? braceletSize
+    : null,
 };
 
   setCartItems((currentItems) => {
@@ -292,16 +295,30 @@ Looking forward to my new accessories!`;
                 <>
                   <div className="cart-items-list">
                     {cartItems.map((item) => (
-                      <div key={item.id} className="cart-item-row">
-                        <div>
-                         <h3>{item.name}</h3>
-<p>Product ID: {item.id}</p>
+  <div
+    key={`${item.id}-${item.size || 'no-size'}`}
+    className="cart-item-row"
+  >
+    <div className="cart-item-product">
+      <div className="cart-item-image-wrapper">
+        <img
+          src={item.image_url}
+          alt={item.name}
+          className="cart-item-image"
+        />
+      </div>
 
-{item.size ? (
-  <p>Size: {item.size}cm</p>
-) : null}
-                        </div>
-                        <div className="cart-item-actions">
+      <div className="cart-item-details">
+        <h3>{item.name}</h3>
+        <p>Product ID: {item.id}</p>
+
+        {item.size ? (
+          <p>Size: {item.size}cm</p>
+        ) : null}
+      </div>
+    </div>
+
+    <div className="cart-item-actions">
                           <label className="cart-quantity-control">
                             <span>Qty</span>
                             <input
