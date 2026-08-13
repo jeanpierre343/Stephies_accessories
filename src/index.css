@@ -1459,6 +1459,72 @@ button {
   font-size: 0.9rem;
 }
 
+.bracelet-size-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bracelet-size-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bracelet-size-header label {
+  font-weight: 700;
+}
+
+.size-help-button {
+  width: 100px;
+  height: 24px;
+  border-radius: 18px;
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--rose-700);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.size-help-button:hover {
+  background: rgba(244, 63, 94, 0.18);
+}
+
+.bracelet-size-section input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(244, 63, 94, 0.24);
+}
+
+.size-tutorial {
+  padding: 14px;
+  border-radius: 14px;
+  background: #fff5f7;
+  border: 1px solid rgba(244, 63, 94, 0.16);
+  text-align: left;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.size-tutorial p {
+  margin: 0 0 10px;
+}
+
+.size-tutorial p:last-child {
+  margin-bottom: 0;
+}
+
+.size-tutorial a {
+  color: var(--rose-700);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 @media (max-width: 860px) {
   .hero-panel {
     grid-template-columns: 1fr;
