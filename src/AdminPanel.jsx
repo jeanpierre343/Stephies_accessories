@@ -27,6 +27,10 @@ const [newProduct, setNewProduct] = useState({
 
 const [addingProduct, setAddingProduct] = useState(false);
 const [addProductError, setAddProductError] = useState('');
+const [showSearchModal, setShowSearchModal] = useState(false);
+const [searchQuery, setSearchQuery] = useState('');
+const [searchedProduct, setSearchedProduct] = useState(null);
+const [searchError, setSearchError] = useState('');
 
   const handleLogin = async() =>{
     setLoginError('');
@@ -54,6 +58,31 @@ const [addProductError, setAddProductError] = useState('');
     setLoginError('Unable to connect to the server.');
   }
   }
+
+  const handleSearchProduct = () => {
+  setSearchError('');
+  setSearchedProduct(null);
+
+  const query = searchQuery.trim().toLowerCase();
+
+  if (!query) {
+    setSearchError('Enter a product ID or name.');
+    return;
+  }
+
+  const product = products.find(
+    (item) =>
+      String(item.id).toLowerCase() === query ||
+      item.name?.toLowerCase() === query
+  );
+
+  if (!product) {
+    setSearchError('No product found.');
+    return;
+  }
+
+  setSearchedProduct(product);
+};
 
   const handleAddProduct = async (event) => {
   event.preventDefault();
@@ -365,16 +394,34 @@ const handleDeleteProduct = async () => {
   </button>
 </div>
       <div className="gallery-header">
-        <h2 className="gallery-title">Gallery Items</h2>
-        <button
-  type="button"
-  className="add-item-button"
-  onClick={() => {
-    setAddProductError('');
-    setShowAddItemModal(true);
-  }}
-><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg> Add Item</button>
-        </div>
+  <h2 className="gallery-title">Gallery Items</h2>
+
+  <div style={{ display: 'flex', gap: '10px' }}>
+    <button
+      type="button"
+      className="add-item-button"
+      onClick={() => {
+        setSearchQuery('');
+        setSearchedProduct(null);
+        setSearchError('');
+        setShowSearchModal(true);
+      }}
+    >
+      Search Product
+    </button>
+
+    <button
+      type="button"
+      className="add-item-button"
+      onClick={() => {
+        setAddProductError('');
+        setShowAddItemModal(true);
+      }}
+    >
+      + Add Item
+    </button>
+  </div>
+</div>
         {showAddItemModal && (
   <div
     className="admin-modal-backdrop"
@@ -503,6 +550,115 @@ const handleDeleteProduct = async () => {
         </div>
 
       </form>
+    </div>
+  </div>
+)}
+{showSearchModal && (
+  <div
+    className="admin-modal-backdrop"
+    onClick={() => setShowSearchModal(false)}
+  >
+    <div
+      className="admin-modal"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <div className="admin-modal-header">
+        <h2>Search Product</h2>
+
+        <button
+          type="button"
+          className="admin-modal-close"
+          onClick={() => setShowSearchModal(false)}
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="add-product-form">
+        <label>
+          Product ID or Name
+
+          <input
+            type="text"
+            placeholder="e.g. 12 or Pearl Bracelet"
+            value={searchQuery}
+            onChange={(event) => {
+              setSearchQuery(event.target.value);
+              setSearchError('');
+              setSearchedProduct(null);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                handleSearchProduct();
+              }
+            }}
+          />
+        </label>
+
+        <button
+          type="button"
+          className="add-item-submit"
+          onClick={handleSearchProduct}
+        >
+          Search
+        </button>
+
+        {searchError && (
+          <p className="add-product-error">
+            {searchError}
+          </p>
+        )}
+
+        {searchedProduct && (
+          <div className="searched-product-result">
+            <div className="searched-product-image">
+              <img
+                src={searchedProduct.image_url}
+                alt={searchedProduct.name}
+              />
+            </div>
+
+            <div className="searched-product-info">
+              <h3>{searchedProduct.name}</h3>
+
+              <p>
+                <strong>Product ID:</strong> {searchedProduct.id}
+              </p>
+
+              <p>
+                <strong>Category:</strong> {searchedProduct.category}
+              </p>
+
+              <p>
+                <strong>Price:</strong> ${searchedProduct.price}
+              </p>
+
+              {searchedProduct.description && (
+                <p>
+                  <strong>Description:</strong>{' '}
+                  {searchedProduct.description}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="add-item-submit"
+              onClick={() => {
+                setShowSearchModal(false);
+
+                setEditingProduct({
+                  ...searchedProduct,
+                  newImage: null,
+                });
+              }}
+            >
+              Edit Product
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   </div>
 )}
