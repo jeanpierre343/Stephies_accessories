@@ -6,7 +6,7 @@ const categories = [
   {
     title: 'Bracelets',
     value: 'bracelet',
-    description: 'Delicate chains, charm bracelets sdfghjkjhgfds.',
+    description: 'Delicate chains, charm bracelets',
   },
   {
     title: 'Rings',
