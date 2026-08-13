@@ -520,6 +520,11 @@ button {
   font-weight: 700;
 }
 
+.footer-credit a{
+  color:inherit;
+  text-decoration: none;
+}
+
 @media (min-width: 720px) {
   .site-footer {
     padding: 56px 40px 36px;
