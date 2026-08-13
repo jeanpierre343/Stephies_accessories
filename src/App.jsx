@@ -80,7 +80,7 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch('https://stephies-accessories-api.onrender.com/api/products');
         if (!response.ok) {
           const text = await response.text();
           const message = text ? text : response.statusText;

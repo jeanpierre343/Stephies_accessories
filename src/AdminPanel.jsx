@@ -32,7 +32,7 @@ const [addProductError, setAddProductError] = useState('');
     setLoginError('');
 
     try {
-    const response = await fetch('/api/admin/login', {
+    const response = await fetch('https://stephies-accessories-api.onrender.com/api/admin/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const [addProductError, setAddProductError] = useState('');
 
     const imageUrl = imageData.publicUrl;
 
-    const response = await fetch('/api/products', {
+    const response = await fetch('https://stephies-accessories-api.onrender.com/api/products', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -165,7 +165,7 @@ const handleEditProduct = async (event) => {
       imageUrl = imageData.publicUrl;
     }
 
-    const response = await fetch(`/api/products/${editingProduct.id}`, {
+    const response = await fetch(`https://stephies-accessories-api.onrender.com/api/products/${editingProduct.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -212,7 +212,7 @@ const handleDeleteProduct = async () => {
   if (!confirmed) return;
 
   try {
-    const response = await fetch(`/api/products/${editingProduct.id}`, {
+    const response = await fetch(`https://stephies-accessories-api.onrender.com/api/products/${editingProduct.id}`, {
       method: 'DELETE',
     });
 
@@ -240,7 +240,7 @@ const handleDeleteProduct = async () => {
   useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products');
+      const response = await fetch('https://stephies-accessories-api.onrender.com/api/products');
 
       if (!response.ok) {
         throw new Error('Failed to load products');
