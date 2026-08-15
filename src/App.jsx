@@ -546,7 +546,7 @@ Looking forward to my new accessories!`;
   </div>
 </div>
                 <div className="product-total-row">
-                  <span>Total</span>
+                  <span>Total.</span>
                   <strong>${totalPrice.toFixed(2)}</strong>
                 </div>
                 <form className="checkout-form">
