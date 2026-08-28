@@ -1565,6 +1565,40 @@ button {
   background: white;
 }
 
+.product-category-label {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 0 0 10px 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--rose-700);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.product-image-wrapper {
+  position: relative;
+}
+
+.product-category-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--rose-700);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
 .edit-product-field textarea {
   min-height: 100px;
   resize: vertical;
