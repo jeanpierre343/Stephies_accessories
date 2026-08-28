@@ -4,6 +4,11 @@ import AdminPanel from './AdminPanel';
 
 const categories = [
   {
+    title: 'All',
+    value: 'all',
+    description: 'Browse all of Stephie’s handmade accessories.',
+  },
+  {
     title: 'Bracelets',
     value: 'bracelet',
     description: 'Delicate chains, charm bracelets',
@@ -31,7 +36,7 @@ const categories = [
 ];
 
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState('bracelet');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [typedText, setTypedText] = useState('');
   const [productsData, setProductsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -98,7 +103,12 @@ function App() {
     fetchProducts();
   }, []);
 
-  const filteredProducts = productsData.filter((item) => item.category?.toLowerCase() === selectedCategory);
+  const filteredProducts =
+  selectedCategory === 'all'
+    ? productsData
+    : productsData.filter(
+        (item) => item.category?.toLowerCase() === selectedCategory
+      );
 
   const navigateTo = (nextPath) => {
     window.history.pushState({}, '', nextPath);
@@ -416,12 +426,22 @@ Looking forward to my new accessories!`;
                     >
                       <div className="product-image-link">
                         <div className="product-image-wrapper">
-                          <img src={product.image_url} alt={product.name} />
-                        </div>
+  {selectedCategory === 'all' ? (
+    <span className="product-category-label">
+      {product.category}
+    </span>
+  ) : null}
+
+  <img src={product.image_url} alt={product.name} />
+</div>
                       </div>
                       <h3>{product.name}</h3>
-                      {product.description ? <p>{product.description}</p> : null}
-                      <div className="product-meta">${product.price}</div>
+
+{product.description ? (
+  <p>{product.description}</p>
+) : null}
+
+<div className="product-meta">${product.price}</div>
                       
                     </article>
                   ))}
