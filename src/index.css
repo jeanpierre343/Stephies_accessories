@@ -753,11 +753,8 @@ button {
   height: 40px;
   border: none;
   border-radius: 999px;
-<<<<<<< HEAD
   background: rgba(244, 63, 94, 0.1);
-=======
   background: rgba(244, 63, 94, 0.3);
->>>>>>> 3788e5a (.)
   color: var(--rose-700);
   font-size: 1.4rem;
   cursor: pointer;
